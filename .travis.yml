@@ -1,0 +1,10 @@
+language: python
+
+# safelist
+branches:
+  
+  only:
+  - master
+  - milestone_1b
+
+script: python Travis_test.py
