@@ -1,4 +1,4 @@
-1. What tasks has each group member been assigned to for Milestone 2?
+## 1. What tasks has each group member been assigned to for Milestone 2?
 
 For Milestone 2, our group has decided to work on software implementation together, and documentation and 
 testing separately. More specifically, we anticipate our current workflow to evolve as follows:
@@ -14,7 +14,7 @@ notebook to accomodate code blocks for demos.
 include parsing vector-valued functions with multiple inputs, building out the gradient descent functionality, 
 among other ideas that we may come up with over the course of the development process.
 
-2. What has each group member done since the submission of Milestone 1?
+## 2. What has each group member done since the submission of Milestone 1?
 
 Since Milestone 1, the group received feedback on our original documentation. Our feedback mainly concerned
 the handling of vector-valued functions in our two classes and overloading the basic mathematical operations
