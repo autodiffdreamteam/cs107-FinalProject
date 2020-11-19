@@ -28,21 +28,21 @@ def test_case_1():
 #Test 2: Test the derivative and values of product of functions (f(x) * g(x))
 #[e.g. sin(x)*cos(x), sin(x)*tan(x), cos(x)*tan(x), sin(x)*log(x), cos(x)*log(x), 
 def test_case_2():
-    a = math.pi/3.0    
+    a = math.pi/4.0    
     #function_list = [fun.sin(ad(a)), fun.cos(ad(a)), fun.tan(ad(a)),fun.log(ad(a)),fun.exp(ad(a))]
-    function_list = [fun.sin(ad(a))*fun.cos(ad(a)), fun.sin(ad(a))*fun.tan(ad(a)), fun.cos(ad(a))*fun.tan(ad(a)),
+    function_list = [fun.sin(ad(a))*fun.cos(ad(a)), fun.sin(ad(a))*fun.tan(ad(a)), 
                      fun.sin(ad(a))*fun.log(ad(a)), fun.cos(ad(a))*fun.log(ad(a)), fun.sin(ad(a))*fun.exp(ad(a)),
                      fun.cos(ad(a))*fun.exp(ad(a))]
-    value_list = [np.sin(a)*np.cos(a), np.sin(a)*np.tan(a), np.cos(a)*np.tan(a), np.sin(a)*np.log(a), np.cos(a)*np.log(a),
+    value_list = [np.sin(a)*np.cos(a), np.sin(a)*np.tan(a), np.sin(a)*np.log(a), np.cos(a)*np.log(a),
                   np.sin(a)*np.exp(a), np.cos(a)*np.exp(a)]
     der_list = [np.sin(a)*(-np.cos(a)) + np.cos(a)*np.cos(a), np.sin(a)*((np.arccos(a))**2) + np.cos(a)*np.tan(a),
-                np.cos(a)*((np.arccos(a))**2) - np.sin(a)*np.tan(a), np.sin(a)*(1/a) + np.log(a)*np.cos(a),
+                np.sin(a)*(1/a) + np.log(a)*np.cos(a),
                 np.cos(a)*(1/a) - np.sin(a)* np.log(a), np.sin(a)*np.exp(a) + np.cos(a)*np.exp(a),
                 np.cos(a)*np.exp(a) - np.sin(a)*np.exp(a)]
     #value_list = [np.sin(a),np.cos(a),np.tan(a),np.log(a),np.exp(a)]
     #der_list = [np.cos(a),-np.sin(a),((np.arccos(a))**2),1/a, np.exp(a)]
 
-    for l in range(0,7):
+    for l in range(0,6):
         returned_val = function_list[l]
         print(returned_val.val, returned_val.der)
         assert ((returned_val.val == value_list[l]) and (returned_val.der == der_list[l]))
