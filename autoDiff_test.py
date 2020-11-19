@@ -2,8 +2,8 @@
 import pytest
 import numpy as np
 import math
-from AutoDiff import AutoDiff as ad
-from Function import Function as fun
+from AutoDiff import AutoDiffPy as ad
+#from Function import Function as fun
 
 #Test 1: Test the derivative and values of elementary function
 #[e.g., sin(x), cos(x), tan(x), log(x), exp(x)]
@@ -11,53 +11,56 @@ from Function import Function as fun
 def test_case_1():
     
     a = math.pi/4.0    
-    function_list = [fun.sin(ad(a)), fun.cos(ad(a)), fun.tan(ad(a)),fun.log(ad(a)),fun.exp(ad(a))]
-    value_list = [np.sin(a),np.cos(a),np.tan(a),np.log(a),np.exp(a)]
-    der_list = [np.cos(a),-np.sin(a),((np.arccos(a))**2),1/a, np.exp(a)]
-
-    for l in range(0,3):
-        returned_val = function_list[l]
-        print(returned_val.val, returned_val.der)
-        assert ((returned_val.val == value_list[l]) and (returned_val.der == der_list[l]))
-
-
-#Test 2: Test the derivative and values of composite functions (f(g(x))
-#[e.g. sin(cos(x)), cos(sin(x)), sin(tan(x)), cos(tan(x)), log(sin(x), log(cos(x)), log(tan(x))]
-
-
-#Test 2: Test the derivative and values of product of functions (f(x) * g(x))
-#[e.g. sin(x)*cos(x), sin(x)*tan(x), cos(x)*tan(x), sin(x)*log(x), cos(x)*log(x), 
-def test_case_2():
-    a = math.pi/4.0    
     #function_list = [fun.sin(ad(a)), fun.cos(ad(a)), fun.tan(ad(a)),fun.log(ad(a)),fun.exp(ad(a))]
-    function_list = [fun.sin(ad(a))*fun.cos(ad(a)), fun.sin(ad(a))*fun.log(ad(a)), fun.cos(ad(a))*fun.log(ad(a)), fun.sin(ad(a))*fun.exp(ad(a)),
-                     fun.cos(ad(a))*fun.exp(ad(a))]
-    value_list = [np.sin(a)*np.cos(a), np.sin(a)*np.log(a), np.cos(a)*np.log(a),
-                  np.sin(a)*np.exp(a), np.cos(a)*np.exp(a)]
-    der_list = [np.sin(a)*(-np.cos(a)) + np.cos(a)*np.cos(a),
-                np.sin(a)*(1/a) + np.log(a)*np.cos(a),
-                np.cos(a)*(1/a) - np.sin(a)* np.log(a), np.sin(a)*np.exp(a) + np.cos(a)*np.exp(a),
-                np.cos(a)*np.exp(a) - np.sin(a)*np.exp(a)]
-    #value_list = [np.sin(a),np.cos(a),np.tan(a),np.log(a),np.exp(a)]
-    #der_list = [np.cos(a),-np.sin(a),((np.arccos(a))**2),1/a, np.exp(a)]
+    #((np.arccos(a))**2)
+    function_list = ['sin(x)', 'cos(x)', 'log(x)', 'exp(x)']
+    value_list = [np.sin(a),np.cos(a),np.log(a),np.exp(a)]
+    der_list = [np.cos(a),-np.sin(a),1/a, np.exp(a)]
 
-    for l in range(0,5):
-        returned_val = function_list[l]
+    for l in range(0,1):
+        returned_val = ad(a, input_function=function_list[l])
         print(returned_val.val, returned_val.der)
         assert ((returned_val.val == value_list[l]) and (returned_val.der == der_list[l]))
 
 
-#Test 3: Test the derivative and values of sum of functions (f(x) + g(x))
-#[e.g. sin(x) + cos(x), sin(x) + log(x), sin(x) + exp(x)]
-def test_case_3():
-    a = math.pi/4.0    
-    function_list = [fun.sin(ad(a))+ fun.cos(ad(a)), fun.sin(ad(a)) + fun.log(ad(a)), fun.sin(ad(a)) + fun.exp(ad(a))]
-    value_list = [np.sin(a) + np.cos(a), np.sin(a) + np.log(a), np.sin(a) + np.exp(a)]
-    der_list = [np.cos(a) - np.sin(a),  np.cos(a) + 1/a, np.cos(a) + np.exp(a)]
-    
+#Test 2: Test the simple power functions
+#[e.g., x, x^2]
 
-    for l in range(0,3):
-        returned_val = function_list[l]
+def test_cast2():
+    a = 4.0
+    function_list = ['x', 'x^0.5', 'x^2', 'x^3']
+    value_list = [4.0, 2.0, 16.0, 64.0]
+    der_list = [1.0, 0.25, 8.0, 48.0]
+
+    for l in range(0,4):
+        returned_val = ad(a, input_function = function_list[l])
+        print(returned_val.val, returned_val.der)
+        assert ((returned_val.val == value_list[l]) and (returned_val.der == der_list[l]))
+
+
+#Test 3: Test polynomials
+def test_cast3():
+    a = 1.0
+    function_list = ['x+5','x^2+1', 'x^2+x+2', 'x^3+x^2+x+1']
+    value_list = [6.0,2.0, 4.0, 4.0]
+    der_list = [1.0,2.0, 3.0, 6.0]
+
+    for l in range(0,4):
+        returned_val = ad(a, input_function = function_list[l])
+        print(returned_val.val, returned_val.der)
+        assert ((returned_val.val == value_list[l]) and (returned_val.der == der_list[l]))
+
+
+
+#Test 4: Test composites
+def test_cast4():
+    a = 0.0
+    function_list = ['log(x+1)', 'cos(x^2)']
+    value_list = [0.0, 1.0]
+    der_list = [1.0, 0.0]
+
+    for l in range(0,1):
+        returned_val = ad(a, input_function = function_list[l])
         print(returned_val.val, returned_val.der)
         assert ((returned_val.val == value_list[l]) and (returned_val.der == der_list[l]))
 

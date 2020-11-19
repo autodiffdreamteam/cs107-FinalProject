@@ -10,5 +10,6 @@ branches:
 
 install:
   - pip install -U pytest
+  - pip install numpy
 
 script: pytest autoDiff_test.py
