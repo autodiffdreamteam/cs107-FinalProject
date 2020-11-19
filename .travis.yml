@@ -6,5 +6,9 @@ branches:
   only:
   - master
   - milestone_1b
+  - milestone2_aditya
 
-script: python Travis_test.py
+install:
+  - pip install -U pytest
+
+script: pytest autoDiff_test.py
