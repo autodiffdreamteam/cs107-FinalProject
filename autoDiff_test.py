@@ -28,7 +28,7 @@ def test_case_1():
 #Test 2: Test the derivative and values of product of functions (f(x) * g(x))
 #[e.g. sin(x)*cos(x), sin(x)*tan(x), cos(x)*tan(x), sin(x)*log(x), cos(x)*log(x), 
 def test_case_2():
-    a = math.pi/4.0    
+    a = math.pi/3.0    
     #function_list = [fun.sin(ad(a)), fun.cos(ad(a)), fun.tan(ad(a)),fun.log(ad(a)),fun.exp(ad(a))]
     function_list = [fun.sin(ad(a))*fun.cos(ad(a)), fun.sin(ad(a))*fun.tan(ad(a)), fun.cos(ad(a))*fun.tan(ad(a)),
                      fun.sin(ad(a))*fun.log(ad(a)), fun.cos(ad(a))*fun.log(ad(a)), fun.sin(ad(a))*fun.exp(ad(a)),
