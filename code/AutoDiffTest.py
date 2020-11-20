@@ -6,8 +6,7 @@ from AutoDiff import AutoDiffPy as ad
 
 #Test 1: Test the derivative and values of elementary function
 #[e.g., sin(x), cos(x), tan(x), log(x), exp(x)]
-def test_case_1():
-    
+def test_case_1():    
     a = math.pi/4.0    
     #function_list = [fun.sin(ad(a)), fun.cos(ad(a)), fun.tan(ad(a)),fun.log(ad(a)),fun.exp(ad(a))]
     #((np.arccos(a))**2)
@@ -46,7 +45,6 @@ def test_cast3():
         returned_val = ad(a, input_function = function_list[l])
         print(returned_val.val, returned_val.der)
         assert ((returned_val.val == value_list[l]) and (returned_val.der == der_list[l]))
-
 
 
 #Test 4: Test composites
