@@ -1,0 +1,5 @@
+# how to run this file:
+# pip install -r requirements.txt
+numpy
+pytest
+
