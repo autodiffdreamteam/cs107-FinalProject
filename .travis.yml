@@ -14,7 +14,7 @@ install:
   - pip install numpy
 
 script: 
-  - pytest --cov=./ad_library/AutoDiff_test.py
+  - pytest --cov=./ad_library/test_AutoDiff.py
   
 after_success:
 
