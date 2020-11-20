@@ -12,6 +12,3 @@ install:
 
 script: pytest AutoDiffTest.py
 
-after_success:
-  
-  -codecov
