@@ -42,7 +42,12 @@ class AutoDiffPy():
 
     # Overload the subtraction dunder method
     def __sub__(self, other):
-        return self.__add__(-other)
+        try: 
+            self.val -= other.val
+            self.der -= other.der
+        except AttributeError:
+            self.val -= other
+        return self
 
     # Overload the right subtraction dunder method
     def __rsub__(self, other):
@@ -82,11 +87,11 @@ class AutoDiffPy():
     def __pow__(self, other):
         try:
             # Use the chain rule to calculate derivative
-            self.der = np.log(self.val)*(self.val**other.val)
+            self.der = other.val*(self.val**(other.val-1))*self.der + np.log(np.abs(self.val))*(self.val**other.val)*other.der
             self.val **= other.val
         except AttributeError:
+            self.der = other*self.der*(self.val**(other - 1))
             self.val **= other
-            self.der = other.val*(self.val**(other - 1))
         return self
 
     # Overload the right power dunder method
@@ -106,26 +111,6 @@ class AutoDiffPy():
     def der(self):
         return self.der
 
-    # Define sin function for true value and derivative
-    def sin(self, x):
-        return AutoDiffPy(np.sin(x.val), np.cos(x.val)*x.der)
-
-    # Define cos function for true value and derivative
-    def cos(self, x):
-        return AutoDiffPy(np.cos(x.val), -np.sin(x.val)*x.der)
-
-    # Define tan function for true value and derivative
-    def tan(self, x):
-        return AutoDiffPy(np.tan(x.val), (np.arccos(x.val)**2)*x.der)
-
-    # Define log function for true value and derivative
-    def log(self, x):
-        return AutoDiffPy(np.log(x.val), (1/x.val)*x.der)
-
-    # Define exp function for true value and derivative
-    def exp(self, x):
-        return AutoDiffPy(np.exp(x.val), (np.exp(x.val))*x.der)
-    
     # Define method to access AutoDiffPy functions by string
     def derivative_dict(self, function):
         '''
