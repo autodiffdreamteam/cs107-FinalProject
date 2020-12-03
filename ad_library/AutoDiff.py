@@ -3,7 +3,7 @@ from math import log, sin, cos, exp, tan
 import math
 
 
-class AutoDiffPy():
+class AutoDiff():
     
     def __init__(self, val, der = 1, input_function = None):
         '''
@@ -19,7 +19,7 @@ class AutoDiffPy():
         AutoDiffPy object with a value and derivative.
         '''
 
-        if input_function !=None:
+        if input_function != None:
             self.val = 0
             self.der = 0
             self.parse_input(input_function, val)
@@ -30,11 +30,9 @@ class AutoDiffPy():
     # Overload add dunder method
     def __add__(self, other):
         try:
-            self.val += other.val
-            self.der += other.der
+            return AutoDiff(self.val + other.val, self.der + other.der)
         except AttributeError:
-            self.val += other
-        return self
+            return AutoDiff(self.val + other, self.der)
 
     # Handle right side addition
     def __radd__(self, other):
@@ -42,12 +40,10 @@ class AutoDiffPy():
 
     # Overload the subtraction dunder method
     def __sub__(self, other):
-        try: 
-            self.val -= other.val
-            self.der -= other.der
+        try:
+            return AutoDiff(self.val - other.val, self.der - other.der)
         except AttributeError:
-            self.val -= other
-        return self
+            return AutoDiff(self.val - other.val, self.der)
 
     # Overload the right subtraction dunder method
     def __rsub__(self, other):
@@ -57,12 +53,9 @@ class AutoDiffPy():
     def __mul__(self, other):
         try:
             # Use the product rule to calculate derivative
-            self.der = self.val*other.der + other.val*self.der
-            self.val *= other.val
+            return AutoDiff(self.val * other.val, self.val*other.der + other.val*self.der)
         except AttributeError:
-            self.val *= other
-            self.der *= other
-        return self
+            return AutoDiff(self.val*other, self.der*other)
 
     # Handle right side multiplication
     def __rmul__(self, other):
@@ -72,12 +65,9 @@ class AutoDiffPy():
     def __truediv__(self, other):
         try:
             # Use the quotient rule to calculate derivative
-            self.der = (self.der*other.val - self.val*other.der) / other.val**2
-            self.val /= other.val
+            return AutoDiff(self.val / other.val, (self.der*other.val - self.val*other.der) / other.val**2)
         except AttributeError:
-            self.val /= other
-            self.der /= other
-        return self
+            return AutoDiff(self.val / other, self.der / other)
 
     # Overload the right side division dunder method
     def __rtruediv__(self, other):
@@ -87,12 +77,9 @@ class AutoDiffPy():
     def __pow__(self, other):
         try:
             # Use the chain rule to calculate derivative
-            self.der = other.val*(self.val**(other.val-1))*self.der + np.log(np.abs(self.val))*(self.val**other.val)*other.der
-            self.val **= other.val
+            return AutoDiff(self.val**other.val, other.val*(self.val**(other.val-1))*self.der + np.log(np.abs(self.val))*(self.val**other.val)*other.der)
         except AttributeError:
-            self.der = other*self.der*(self.val**(other - 1))
-            self.val **= other
-        return self
+            return AutoDiff(self.val**other, other*self.der*(self.val**(other-1)))
 
     # Overload the right power dunder method
     def __rpow__(self, other):
@@ -100,8 +87,7 @@ class AutoDiffPy():
     
     # Overload the negation dunder method
     def __neg__(self):
-        self.val *= -1
-        self.der *= -1
+        return AutoDiff(-1*self.val, -1*self.der)
 
     # Define a function value getter
     def val(self):
