@@ -5,7 +5,7 @@ branches:
   
   only:
   - master
-
+  - milestone3_aditya
 
 install:
   - pip install pytest-cov
@@ -14,7 +14,7 @@ install:
   - pip install numpy
 
 script: 
-  - pytest --cov=./ad_library/test_AutoDiff.py
+  - pytest --cov=./ad_library/
   
 after_success:
 
