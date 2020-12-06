@@ -127,6 +127,22 @@ class AutoDiffPy():
     # Define exp function for true value and derivative
     def exp(self, x):
         return AutoDiffPy(np.exp(x.val), (np.exp(x.val))*x.der)
+
+
+
+    # f = lambda 
+    def Newton(self, epsilon = 0.0000001, max_iter = 10):
+        der = self.der # Dfxn
+        val = self.val # fxn
+        for i in range(max_iter):
+            val = self.val
+            if abs(val) < epsilon:
+                print('Found solution after {i} iterations'.format(i=i))
+            der = self.der
+            if der == 0:
+                print('Derivative reached 0. No solution found')
+                return None
+            val = 
     
     # Define method to access AutoDiffPy functions by string
     def derivative_dict(self, function):
