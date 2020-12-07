@@ -77,12 +77,31 @@ def test_case5():
 #Test 6: Test product of functions
 def test_case6():
     a = math.pi/4.0
-    function_list = ['sin(x) * cos(x)']
-    value_list = [0.5]
-    der_list = [0.0]
+    function_list = ['sin(x) * cos(x)', 'exp(x)*sin(x)']
+    value_list = [math.sin(a)*math.cos(a), math.exp(a)*math.sin(a)]
+    der_list = [-(math.sin(a)**2)+(math.cos(a)**2), math.exp(a)*(math.sin(a)+math.cos(a))]
+
+    for l in range(0,2):
+        returned_val = ad(a, input_function = function_list[l])
+        print(returned_val.val, returned_val.der)
+        assert ((round(returned_val.val,3) == round(value_list[l], 3)) and (round(returned_val.der,3) == round(der_list[l]),3))
+
+
+
+#Test 7: Test negation of functions
+def test_case7():
+    a = math.pi/4.0
+    function_list = ['-sin(x)', '-tan(x)']
+    value_list = [-math.sin(a), -math.tan(a)]
+    der_list = [-math.cos(a), -(np.arccos(a))**2]
 
     for l in range(0,1):
         returned_val = ad(a, input_function = function_list[l])
         print(returned_val.val, returned_val.der)
-        assert ((round(returned_val.val,3) == value_list[l]) and (round(returned_val.der,3) == der_list[l]))
+        assert ((round(returned_val.val,3) == round(value_list[l], 3)) and (round(returned_val.der,3) == round(der_list[l]),3))
+
+
+
+
+
 
