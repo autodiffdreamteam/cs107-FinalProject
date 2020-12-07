@@ -50,11 +50,39 @@ def test_cast3():
 #Test 4: Test composites
 def test_cast4():
     a = 0.0
-    function_list = ['log(x+1)', 'cos(x^2)']
-    value_list = [0.0, 1.0]
-    der_list = [1.0, 0.0]
+    function_list = ['log(x+1)', 'cos(x^2)', 'sin(x^2)']
+    value_list = [0.0, 1.0, 0.0]
+    der_list = [1.0, 0.0,0.0]
+
+    for l in range(0,2):
+        returned_val = ad(a, input_function = function_list[l])
+        print(returned_val.val, returned_val.der)
+        assert ((round(returned_val.val,1) == value_list[l]) and (round(returned_val.der,1) == der_list[l]))
+
+
+#Test 5: Test sum and difference of functions
+
+def test_case5():
+    a = math.pi/4.0
+    function_list = ['sin(x) + cos(x)', 'sin(x) - cos(x)']
+    value_list = [1.414, 0.0]
+    der_list = [0.0, 1.414]
+
+    for l in range(0,2):
+        returned_val = ad(a, input_function = function_list[l])
+        print(returned_val.val, returned_val.der)
+        assert ((round(returned_val.val,3) == value_list[l]) and (round(returned_val.der,3) == der_list[l]))
+
+
+#Test 6: Test product of functions
+def test_case6():
+    a = math.pi/4.0
+    function_list = ['sin(x) * cos(x)']
+    value_list = [0.5]
+    der_list = [0.0]
 
     for l in range(0,1):
         returned_val = ad(a, input_function = function_list[l])
         print(returned_val.val, returned_val.der)
-        assert ((returned_val.val == value_list[l]) and (returned_val.der == der_list[l]))
+        assert ((round(returned_val.val,3) == value_list[l]) and (round(returned_val.der,3) == der_list[l]))
+
