@@ -5,9 +5,9 @@ import math
 
 class AutoDiff():
     
-    def __init__(self, val, der = 1, input_function = None):
+    def __init__(self, val, der=[1], seed=None, input_function=None):
         '''
-        Constructs an AutoDiffPy object to perform forward automatic differentation.
+        Constructs an AutoDiff object to perform forward automatic differentation.
         Parameters:
         self(AutoDiffPy): Self
         val (int/float): This is the seed value that we will evaluate at. 
@@ -18,14 +18,74 @@ class AutoDiff():
         Returns:
         AutoDiffPy object with a value and derivative.
         '''
-
         if input_function != None:
             self.val = 0
             self.der = 0
             self.parse_input(input_function, val)
-        else:        
-            self.val = val
-            self.der = der
+        else:
+            if isinstance(val, (int, float)):
+                val = [val]
+            if len(val) == 1:
+                try:
+                    self.val = val[0].val
+                    self.der = val[0].der
+                except:
+                    if isinstance(der, (int, float)):
+                        der = [der]
+                    self.val = np.array(val)
+                    self.der = np.array(der)
+            else:
+                all_scalar = self._check_all_scalar(val)
+                if all_scalar:
+                    self.val = np.array(val)
+                    self.der = np.array(der)
+                else:
+                    vals = []
+                    ders = []
+                    total_vars = self._get_total_vars(val)
+                    for v in val:
+                        try:
+                            vals.append(v.val)
+                            ders.append(v.der)
+                        except:
+                            vals.append(v)
+                            ders.append(np.zeros(total_vars))
+                    self.val = np.hstack((vals))
+                    self.der = np.vstack((ders))
+
+    def _check_all_scalar(self, val):
+        '''
+        Helper method for initialization. Returns True if all inputs are scalars.
+        '''
+        scalar_list = []
+        for v in val:
+            if isinstance(v, AutoDiff):
+                scalar_list.append(v)
+        return len(scalar_list) == 0
+
+    def _get_total_vars(self, val):
+        '''
+        Helper method for initialization. Returns the total number of variables
+        for a vector-valued function input.
+        '''
+        num_vars = []
+        for v in val:
+            if isinstance(v, AutoDiff):
+                try:
+                    num_vars.append(len(v.der[0]))
+                except: # TypeError?
+                    num_vars.append(v.der)
+            else:
+                num_vars.append(0)
+        return np.max(num_vars)
+    
+    # Define a function value getter
+    def val(self):
+        return self.val
+
+    # Define a function derivative getter
+    def der(self):
+        return self.der
 
     # Overload add dunder method
     def __add__(self, other):
@@ -43,7 +103,7 @@ class AutoDiff():
         try:
             return AutoDiff(self.val - other.val, self.der - other.der)
         except AttributeError:
-            return AutoDiff(self.val - other.val, self.der)
+            return AutoDiff(self.val - other, self.der)
 
     # Overload the right subtraction dunder method
     def __rsub__(self, other):
@@ -89,251 +149,9 @@ class AutoDiff():
     def __neg__(self):
         return AutoDiff(-1*self.val, -1*self.der)
 
-    # Define a function value getter
-    def val(self):
-        return self.val
-
-    # Define a function derivative getter
-    def der(self):
-        return self.der
-
-    # Define method to access AutoDiffPy functions by string
-    def derivative_dict(self, function):
-        '''
-        Takes in an a string representing a function and returns a tuple of the update value and derivative
-        Parameter(s):
-        self(AutoDiffPy): Self, an AutoDiffPy object
-        function(str): A 3 character string denoting an elementary function like cos or log
-        
-        Returns:
-        autodiff_new.val(float/int): The new value after applying the specified function
-        autodiff_new.der(float/int): The new derivative after applying the specified function
-        '''
-
-        derivative_dict = {'sin': self.sin, 'cos': self.cos, 'tan': self.tan, 'log': self.log, 'exp': self.exp}
-        autodiff_new = derivative_dict[function](self)
-        return autodiff_new.val, autodiff_new.der
-
-    def parse_input(self, input_function, a): 
-        '''
-        parse_input parses an input function of the form (write format parameters) , sequentially feeding all 
-        operations and derivatives of such to perform forward automatic differentation on the given input_function.
-        Parameters:
-        self(AutoDiffPy): Self, an AutoDiffPy object
-        input_function(str):
-        a(int/float): The value which the input function will be evaluated at.
-        Returns: Void
-        '''
-
-        # Example input: 'log(x^2 + 5)', seed = a
-        lefts_par = input_function.split('(')
-        parsed_eq = []
-        for rights_par in lefts_par:
-            elements = rights_par.split(')')
-            for el in elements:
-                parsed_eq.append(el)
+    def __str__(self):
+        return 'Values: {}\nJacobian: {}'.format(self.val, self.der)
     
-        center = math.floor(len(parsed_eq)/2)
-        self.val = self.simplify(parsed_eq[center], a)
-        self.der = self.simplify(parsed_eq[center], a, der=True)
-
-        for func in parsed_eq[0:center]:
-            self.val, self.der = self.derivative_dict(func) 
-        # no return value 
-
-    # Splits a coefficient
-    def coef_split(self, x):
-        split = x.split('*')
-        if len(split) > 1:
-            coef = float(split[0])
-            power = split[1].split('^')
-        else:
-            coef = 1
-            power = split[0].split('^')
-
-        if len(power)>1:
-            power = float(power[1])
-        else:
-            power = 1
-        return coef, power
-
-    # Evaluates an x term
-    def coef_evaluate(self, x, a, der = False):
-        '''
-        Evaluates an x term with an optional coefficent and power. If der == True evaluates the derivative instead.
-        Parameters:
-        self(AutoDiffPy)
-        x(str): A string representing an x term with an optional coefficient and power
-        a(float/int): The value to evaluate x at
-        der(bool): If True, the derivative value is evaluated using the power rule. 
-        '''
-        if not 'x' in x:
-            if der == True:
-                return 0
-            else:
-                return float(x)
-        split = x.split('*')
-        if len(split) > 1:
-            coef = float(split[0])
-            power = split[1].split('^')
-        else:
-            coef = 1
-            power = split[0].split('^')
-
-        if len(power)>1:
-            power = float(power[1])
-        else:
-            power = 1
-        if der == True:
-            value = (coef * power)*(a**(power-1))
-        else:
-            value = (a**power) * coef
-        return value
-
-    # Performs the power rule on a string representing an x term
-    def power_rule(self, x, realx):
-        '''
-        Params:
-        x(str): A string representing an x term with a optional coefficient and power such as '3*x^5'
-        realx(int/float): The seed value for the expression to be evaluated at. 
-        
-        Returns:
-        Value after application of power rule
-        '''
-        split = x.split('*')
-        coef = float(split[0])
-        power = split[1].split('^')
-        if len(power)>1:
-            power = float(power[1])
-        else:
-            return coef * realx
-        return (coef * power)*realx**(power-1)
 
 
-    def simplify(self, x, seed = None, der = False): # where x is string of polynomial such as '3*x^2 * 5*x^3 + 5', if seed == True, we evaluate
-        '''
-        Simplifies a polynomial expression
-        Parameters: 
-        self(AutoDiffPy): An AutoDiffPy object
-        x(str): A string representation of a polynomial expression
-        seed(int/float): The value to evaluated at
-        der (bool): If der == True, then it will both simplify the polynomial, and evaluate its derivative.
-        Returns:
-        runningval: The polynomial expression evaluted at the seed if seed != None
-        OR
-        simplified: The polynomial expression simplified and returned as a string  
-        '''
-        # split by addition/subtraction
-        minus_split = x.split('-')
-        plusminus_split = []    
-        for i in range(len(minus_split)):
-            plus_split = minus_split[i].split('+')
-            for j in range(len(plus_split)):
-                plusminus_split.append(plus_split[j])
-                if j < len(plus_split) - 1:
-                    plusminus_split.append('+')
-            if i < len(minus_split) - 1:
-                plusminus_split.append('-')
 
-        final_array = []
-
-        # split my multiplication/division
-        for section in plusminus_split:
-            bsymb = False
-            multdiv_split = []
-
-            # simplify sections
-            mult_split = section.split(' * ')
-            for i in range(len(mult_split)):
-                div_split = mult_split[i].split('/')
-                for j in range(len(div_split)):
-                    multdiv_split.append(div_split[j])
-                    if j < len(div_split) - 1:
-                        multdiv_split.append('/')
-                if i < len(mult_split) - 1:
-                    multdiv_split.append('*')
-            if len(multdiv_split) == 1:
-                final_array.append(section)
-            else:
-                for i in range(len(multdiv_split)):
-                    # Set symbol to false if index is at an operator
-                    symbol = False
-                    if '*' == multdiv_split[i]:
-                        symbol = True
-                        try:
-                            formatted = False
-                            if 'x' in multdiv_split[i-1]: 
-                                print(multdiv_split[i-1], multdiv_split[i+1])
-                                if 'x' in multdiv_split[i+1]:
-                                    x1_coef, x1_power = self.coef_split(multdiv_split[i-1])
-                                    x2_coef, x2_power = self.coef_split(multdiv_split[i+1])
-                                    newval = str(x1_coef+x2_coef)+'*x^'+ str(x1_power+x2_power)
-                                    formatted = True
-
-                            if multdiv_split[i-1].isnumeric() and 'x' in multdiv_split[i+1]:
-                                x2_coef, x2_power = self.coef_split(multdiv_split[i+1])
-                                newval =  str(int(multdiv_split[i-1])*x2_coef) + '*x^' + str(x2_power)
-                                formatted = True
-
-                            if 'x' in multdiv_split[i-1] and multdiv_split[i+1].isnumeric():
-                                x1_coef, x1_power = self.coef_split(multdiv_split[i-1])
-                                newval = str(x1_coef) + '*x^' + str(int(multdiv_split[i+1])+x1_power)
-                                formated = True
-                            if formatted == False:
-                                raise Exception('Incorrect format in multiplication')
-                        except IndexError:
-                            print("Loop ended")
-
-                    elif '/' == multdiv_split[i]:
-                        symbol = True
-                        try:
-                            if 'x' in multdiv_split[i-1] and 'x' in multdiv_split[i+1]:
-                                x1_coef, x1_power = self.coef_split(multdiv_split[i-1])
-                                x2_coef, x2_power = self.coef_split(multdiv_split[i+1])
-                                newval =  str(x1_coef+x2_coef)+'*x^'+ str(x1_power+x2_power)
-
-                        except IndexError:
-                            raise Exception('Syntax error on input, hanging /')
-
-                        if multdiv_split[i-1].isnumeric() and 'x' in multdiv_split[i+1]:
-                            x2_coef, x2_power = self.coef_split(multdiv_split[i+1])
-                            newval = str(int(multdiv_split[i-1])/x2_coef) + '*x^' + str(x2_power)
-
-                        if 'x' in multdiv_split[i-1] and multdiv_split[i+1].isnumeric():
-                            x1_coef, x1_power = self.coef_split(multdiv_split[i-1])
-                            newval = str(x1_coef) + '*x^' + str(int(multdiv_split[i+1])-x1_power)
-
-                        else:
-                            raise Exception('Invalid syntax!!!')
-                
-                    if symbol == True:
-                        bsymb = True
-                        multdiv_split[i+1] = newval
-                        final_array.append(newval)
-        simplified = ''
-        runningval = 0
-        for i in range(len(final_array)):
-            if seed != None:
-                try:
-                    if final_array[i] == '+':
-                        try:
-                            runningval += self.coef_evaluate(final_array[i+1], seed, der)
-                        except IndexError:
-                            print("Syntax error, hanging +")
-                    if final_array[i] == '-':
-                        try:
-                            runningval -= self.coef_evaluate(final_array[i+1], seed, der)
-                        except IndexError:
-                            print("Syntax error, hanging -")
-
-                    if i==0 and 'x' in final_array[i]:    
-                        runningval = self.coef_evaluate(final_array[0], seed, der)
-
-                except TypeError:
-                    raise Exception('Seed in simplify-evaluate is not a valid number')
-            else:
-                simplified += final_array[i]
-        if seed != None:
-            return runningval
-        else:
-            return simplified
