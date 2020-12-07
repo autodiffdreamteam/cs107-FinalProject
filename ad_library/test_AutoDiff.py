@@ -2,7 +2,7 @@
 import pytest
 import numpy as np
 import math
-from AutoDiff import AutoDiffPy as ad
+from AutoDiff import AutoDiff as ad
 
 #Test 1: Test the derivative and values of elementary function
 #[e.g., sin(x), cos(x), tan(x), log(x), exp(x)]
@@ -10,9 +10,9 @@ def test_case_1():
     a = math.pi/4.0    
     #function_list = [fun.sin(ad(a)), fun.cos(ad(a)), fun.tan(ad(a)),fun.log(ad(a)),fun.exp(ad(a))]
     #((np.arccos(a))**2)
-    function_list = ['sin(x)', 'cos(x)', 'log(x)', 'exp(x)']
-    value_list = [np.sin(a),np.cos(a),np.log(a),np.exp(a)]
-    der_list = [np.cos(a),-np.sin(a),1/a, np.exp(a)]
+    function_list = ['sin(x)', 'cos(x)', 'log(x)', 'exp(x)', 'tan(x)']
+    value_list = [np.sin(a),np.cos(a),np.log(a),np.exp(a), np.tan(a)]
+    der_list = [np.cos(a),-np.sin(a),1/a, np.exp(a), (np.arccos(a))**2]
 
     for l in range(0,1):
         returned_val = ad(a, input_function=function_list[l])
