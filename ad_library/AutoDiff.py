@@ -147,16 +147,3 @@ class AutoDiff():
 
         # check if this should return a new autodiff object?
 
-    def newtons_method(self, x0, epsilon, max_iters):
-        xn = x0
-        for i in range(0,max_iters):
-            fxn, Dfxn = self.evaluate_function(xn)
-            if abs(fxn) < epsilon:
-                print('Found solution after {i} iterations.'.format(i=i))
-                return xn
-            if Dfxn == 0:
-                print('Reached zero derivative. No solution found.')
-                return None
-            xn = xn - fxn/Dfxn
-        print('No solution found after max iterations.')
-        return None
