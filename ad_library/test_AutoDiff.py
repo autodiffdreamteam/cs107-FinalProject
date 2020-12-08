@@ -3,6 +3,8 @@ import pytest
 import numpy as np
 import math
 from AutoDiff import AutoDiff as ad
+from Optimize import optimize as optim
+
 
 #Test 1: Test the derivative and values of elementary function
 #[e.g., sin(x), cos(x), tan(x), log(x), exp(x)]
@@ -91,17 +93,41 @@ def test_case6():
 #Test 7: Test negation of functions
 def test_case7():
     a = math.pi/4.0
-    function_list = ['-sin(x)', '-tan(x)']
-    value_list = [-math.sin(a), -math.tan(a)]
-    der_list = [-math.cos(a), -(np.arccos(a))**2]
+    function_list = ['-sin(x)', '-tan(x)', '-exp(x)']
+    value_list = [-math.sin(a), -math.tan(a), -math.exp(a)]
+    der_list = [-math.cos(a), -(np.arccos(a))**2, -math.exp(a)]
 
-    for l in range(0,1):
+    for l in range(0,3):
         returned_val = ad(a, input_function = function_list[l])
         print(returned_val.val, returned_val.der)
         assert ((round(returned_val.val,3) == round(value_list[l], 3)) and (round(returned_val.der,3) == round(der_list[l]),3))
 
 
 
+#Test 8: Test divison of functions
+#def test_case8():
+#    a = 1.0
+#    function_list = ['1/x', '1/exp(x)']
+#    value_list = [1/a, 1/math.exp(a)]
+#    der_list = [-1/a**2, -1/math.exp(a)]
+
+#    for l in range(0,2):
+#        returned_val = ad(a, input_function = function_list[l])
+#        print(returned_val.val, returned_val.der)
+#        assert ((round(returned_val.val,3) == round(value_list[l], 3)) and (round(returned_val.der,3) == round(der_list[l]),3))
 
 
 
+
+
+def test_case9():
+    func_of_interest = ['x^2', 'x^2 + 1']
+    starting_point = [-1.0, -2.0]
+    optimum_point = [0.0, 0.0]
+
+    for l in range(0, 2):
+        returned_val = optim.graddescent(starting_point[l], func_of_interest[l])
+        assert(round(returned_val,3) == round(optimum_point[l], 3))
+    
+
+    
