@@ -73,7 +73,7 @@ class AutoDiff():
             if isinstance(v, AutoDiff):
                 try:
                     num_vars.append(len(v.der[0]))
-                except: # TypeError?
+                except:
                     num_vars.append(v.der)
             else:
                 num_vars.append(0)
@@ -107,7 +107,10 @@ class AutoDiff():
 
     # Overload the right subtraction dunder method
     def __rsub__(self, other):
-        return self.__sub__(other)
+        try:
+            return AutoDiff(other.val - self.val, other.der - self.der)
+        except AttributeError:
+            return AutoDiff(other - self.val, -self.der)
 
     # Overload the multiplication dunder method
     def __mul__(self, other):
@@ -131,7 +134,10 @@ class AutoDiff():
 
     # Overload the right side division dunder method
     def __rtruediv__(self, other):
-        return self.__truediv__(other)
+        try:
+            return AutoDiff(other.val / self.val, (self.val*other.der - other.val*self.der) / self.val**2)
+        except AttributeError:
+            return AutoDiff(other / self.val, (-other*self.der) / self.val**2)
 
     # Overload the power dunder method
     def __pow__(self, other):
@@ -143,15 +149,49 @@ class AutoDiff():
 
     # Overload the right power dunder method
     def __rpow__(self, other):
-        return self.__pow__(other)
-    
+        try:
+            return AutoDiff(other.val**self.val, other.val*(self.val**(other.val-1))*self.der + np.log(np.abs(self.val))*(self.val**other.val)*other.der)
+        except AttributeError:
+            return AutoDiff(other**self.val, np.log(other)*(other**self.val)*self.der)
+
     # Overload the negation dunder method
     def __neg__(self):
         return AutoDiff(-1*self.val, -1*self.der)
 
+    def __pos__(self):
+        return self
+
+    def __abs__(self):
+        return AutoDiff(abs(self.val), (self.val*self.der / abs(self.val)))
+
+    def __eq__(self, other):
+        try:
+            return (np.all(np.equal(self.val, other.val)) and np.all(np.equal(self.der, other.der)))
+        except AttributeError:
+            return ((self.val == other) and (self.der == [1]))
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __lt__(self, other):
+        try:
+            return self.val < other.val
+        except AttributeError:
+            return self.val < other
+
+    def __gt__(self, other):
+        try:
+            return self.val > other.val
+        except AttributeError:
+            return self.val > other
+
+    def __le__(self, other):
+        return self.__lt__(other) or self.__eq__(other)
+
+    def __ge__(self, other):
+        return self.__gt__(other) or self.__eq__(other)
+
     def __str__(self):
-        return 'Values: {}\nJacobian: {}'.format(self.val, self.der)
+        return 'Values:\n{}\nJacobian:\n{}'.format(self.val, self.der)
     
-
-
 
