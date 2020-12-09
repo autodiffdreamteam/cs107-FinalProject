@@ -342,7 +342,7 @@ class AutoDiff():
         return 'Values:\n{}\nJacobian:\n{}'.format(self.val, self.der)
     
 
-class Function(): # dummy class for internal utility
+class Function: # dummy class for internal utility
 
     # Elemental exponential function
     def exp(x):
