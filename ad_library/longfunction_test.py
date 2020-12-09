@@ -1,5 +1,5 @@
 from AutoDiff import AutoDiff as ad
-from Function import Function as fun
+from AutoDiff import Function as fun
 
 ## DEMOS
 
