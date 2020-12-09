@@ -1,12 +1,6 @@
 from AutoDiff import AutoDiff as ad
 from Function import Function as fun
 
-# Demo with f(x) = exp(sin(x))-cos(x^0.5)*sin((cos(x)^2+x^2)^0.5)
-
-#x = ad(2.0)
-#f = fun.exp(fun.sin(x)) - fun.cos(x**0.5)*fun.sin((fun.cos(x)**2 + x**2)**0.5)
-#print(f.val, f.der)
-
 ## DEMOS
 
 # Scalar input with a scalar function
@@ -23,7 +17,7 @@ print('Demo for a vector input with a scalar function:')
 print(f)
 
 # Scalar input with a vector function
-x = ad(3.0)
+x = ad(3.0, input_pos=[3, 0])
 f1 = x**2
 f2 = 5 + x
 f3 = x - 4
@@ -39,4 +33,31 @@ f2 = y**2
 f = ad([f1, f2])
 print('Demo for a vector input with a vector function:')
 print(f)
+
+# Scalar input with a complicated scalar function
+x = ad(2.0)
+f = fun.exp(fun.sin(x)) - fun.cos(x**0.5)*fun.sin((fun.cos(x)**2 + x**2)**0.5)
+print('Demo for a scalar input with a complicated scalar function')
+print(f)
+
+x = ad(3, [1, 0])
+y = ad(2, [0, 1])
+z = x*y
+print(z)
+
+
+# TEST FAILING
+v = ad(1, [1,0,0,0])
+w = ad(2, [0,1,0,0])
+x = ad(3, [0,0,1,0])
+y = ad(4, [0,0,0,1])
+a = ad([1])
+f = ad([1, 2])
+z = a**2
+print(f)
+
+# testing
+x = ad([1, 1])
+y = ad([2, 1])
+print(x < y)
 
