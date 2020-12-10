@@ -390,7 +390,7 @@ class Function:
         '''
         Returns the arctangent of an AutoDiff object with its updated derivative.
         '''
-        return AutoDiff(np.arctan(x.val), (1 / (1 + self.val**2))*x.der)
+        return AutoDiff(np.arctan(x.val), (1 / (1 + x.val**2))*x.der)
 
     def sinh(x):
         '''
@@ -414,7 +414,7 @@ class Function:
         '''
         Returns the square root of an AutoDiff object with its updated derivative.
         '''
-        return AutoDiff(np.sqrt(x), 0.5*(x.val**(-0.5))*x.der)
+        return AutoDiff(np.sqrt(x.val), 0.5*(x.val**(-0.5))*x.der)
 
     def exp(x):
         '''
