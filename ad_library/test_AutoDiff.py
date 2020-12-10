@@ -4,7 +4,7 @@ import numpy as np
 import math
 import numpy
 from AutoDiff import AutoDiff as ad
-#from AutoDiff import Function as fun
+from AutoDiff import Function as fun
 #from Optimize import optimize as optim
 
 
@@ -68,6 +68,63 @@ def test_case_4():
 
 
 def test_case_5():
-    pass
+
+    a = 1.0   
+    x = ad(a)
+    f1 = 1/x
+    value = 1/a
+    der_value = -1/a**2
+    #print(f1)
+    assert (f1.val == value) and (f1.der == der_value)
     
     
+    
+
+def test_case_6():
+
+    a = math.pi/2.0
+    x = ad(a)
+    f = fun.sin(x)
+    value = numpy.sin(a)
+    der_value = numpy.cos(a)
+    assert (f.val == value) and (f.der == der_value)
+
+
+def test_case_7():
+
+    a = math.pi/2.0
+    x = ad(a)
+    f = fun.cos(x)
+    value = numpy.cos(a)
+    der_value = -numpy.sin(a)
+    assert (f.val == value) and (f.der == der_value)
+
+def test_case_8():
+
+    a = math.pi/4.0
+    x = ad(a)
+    f = fun.tan(x)
+    value = numpy.tan(a)
+    der_value = numpy.arctan(a)
+    assert (f.val == value) and (f.der == der_value)
+    
+
+def test_case_9():
+
+    a = 1.0
+    x = ad(a)
+    f = fun.log(x)
+    value = numpy.log(a)
+    der_value = 1/a
+    assert (f.val == value) and (f.der == der_value)
+
+
+def test_case_10():
+
+    a = 0.0
+    x = ad(a)
+    f = fun.exp(x)
+    value = numpy.exp(a)
+    der_value = numpy.exp(a)
+    assert (f.val == value) and (f.der == der_value)
+
