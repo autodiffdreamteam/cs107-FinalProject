@@ -424,9 +424,21 @@ class Function:
 
     def log(x):
         '''
-        Returns the logarithm of an AutoDiff object and its updated derivative.
+        Returns the log (base e) of an AutoDiff object and its updated derivative.
         '''
-        return AutoDiff(np.log(x.val), (1 / (x.val*np.sum(1)))*x.der)
+        return AutoDiff(np.log(x.val), (1 / (x.val))*x.der)
+
+    def log2(x):
+        '''
+        Returns the log (base 2) of an AutoDiff object and its updated derivative.
+        '''
+        return AutoDiff(np.log2(x.val), (1 / (x.val*np.log(2)))*x.der)
+    
+    def log10(x):
+        '''
+        Returns the log (base 10) of an AutoDiff object and its updated derivative.
+        '''
+        return AutoDiff(np.log10(x.val), (1 / (x.val*np.log(10)))*x.der)
 
     def logistic(x):
         '''
