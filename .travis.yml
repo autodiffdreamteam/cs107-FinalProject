@@ -5,12 +5,13 @@ branches:
   
   only:
   - master
+  - milestone_3_blake
 
 install:
   - pip install -U pytest
   - pip install numpy
 
-script: pytest AutoDiffTest.py
+script: pytest test_AutoDiff.py
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
