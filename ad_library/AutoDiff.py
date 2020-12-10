@@ -109,8 +109,10 @@ class AutoDiff():
                         except:
                             vals.append(v)
                             ders.append(np.zeros(total_vars))
-                    self._val = np.hstack((vals))
-                    self._der = np.vstack((ders))
+                    #self._val = np.hstack((vals))
+                    #self._der = np.vstack((ders))
+                    self._val = np.array(vals)
+                    self._der = np.array(ders)
             
     def _check_all_scalar(self, val):
         '''
@@ -134,7 +136,7 @@ class AutoDiff():
                 try:
                     num_vars.append(len(v.der[0]))
                 except:
-                    num_vars.append(v.der)
+                    num_vars.append(len(v.der))
             else:
                 num_vars.append(0)
         return np.max(num_vars)
@@ -192,7 +194,7 @@ class AutoDiff():
         '''
         try:
             # Use the product rule to calculate derivative
-            return AutoDiff(np.multiply(self.val, other.val), np.multiply(self.val, other.der) + np.multiply(other.val, self.der))
+            return AutoDiff(self.val*other.val, self.val*other.der + other.val*self.der)
         except AttributeError:
             return AutoDiff(self.val*other, self.der*other)
 
@@ -208,18 +210,19 @@ class AutoDiff():
         '''
         try:
             # Use the quotient rule to calculate derivative
-            return AutoDiff(np.divide(self.val, other.val), np.divide(np.multiply(self.der, other.val) - np.multiply(self.val, other.der), other.val**2))
+            return AutoDiff(self.val / other.val, (self.der*other.val - self.val*other.der) / other.val**2)
         except AttributeError:
-            return AutoDiff(np.divide(self.val, other), np.divide(self.der, other))
+            return AutoDiff(self.val / other, self.der / other)
 
     def __rtruediv__(self, other):
         '''
         Performs division of other by self.
         '''
         try:
-            return AutoDiff(np.divide(other.val, self.val), np.divide(np.multiply(other.der, self.val) - np.multiply(other.val, self.der), self.val**2))
+            # Use the quotient rule to calculate derivative
+            return AutoDiff(other.val / self.val, (other.der*self.val - other.val*self.der) / self.val**2)
         except AttributeError:
-            return AutoDiff(np.divide(other, self.val), -np.divide(np.multiply(other, self.der), self.val**2))
+            return AutoDiff(other / self.val, -other*self.der / self.val**2)
         
     def __pow__(self, other):
         '''
@@ -227,17 +230,21 @@ class AutoDiff():
         '''
         try:
             # Use the chain rule to calculate derivative
-            return AutoDiff(np.power(self.val, other.val), ((other.val / self.val)*self.der + np.log(self.val)*other.der)*np.power(self.val, other.val))
+            return AutoDiff(self.val**other.val, other.val*(self.val**(other.val-1))*self.der + np.log(np.abs(self.val))*(self.val**other.val)*other.der)
         except AttributeError:
             if other == 0:
                 return AutoDiff(1, der=[0])
-            return AutoDiff(np.power(self.val, other), other*np.multiply(self.der, (self.val**(other-1))))
+            return AutoDiff(self.val**other, other*(self.val**(other-1))*self.der)
 
     def __rpow__(self, other):
         '''
         Raises other to the power of self.
         '''
-        return AutoDiff(other**self.val, (other**self.val)*np.log(other)*self.der)
+        try:
+            # Use the chain rule to calculate derivative
+            return AutoDiff(other.val**self.val, other.val*(self.val**(other.val-1))*self.der + np.log(np.abs(self.val))*(self.val**other.val)*other.der)
+        except AttributeError:
+            return AutoDiff(other**self.val, np.log(other)*(other**self.val)*self.der)
 
     def __neg__(self):
         '''
@@ -342,27 +349,91 @@ class AutoDiff():
         return 'Values:\n{}\nJacobian:\n{}'.format(self.val, self.der)
     
 
-class Function: # dummy class for internal utility
+class Function: 
+    '''
+    Class to hold elementary functions for AutoDiff objects, including
+    trigonometric, inverse trigonometric, exponential, hyperbolic, logistic,
+    logarithm, and square root functions.
+    '''
 
-    # Elemental exponential function
-    def exp(x):
-        return AutoDiff(np.exp(x.val), x.der*np.exp(x.val))
-
-    # Elemental logarithm function
-    def log(x):
-        return AutoDiff(np.log(x.val), x.der/x.val)
-
-    # Elemental sine function
     def sin(x):
+        '''
+        Returns the sine of an AutoDiff object with its updated derivative.
+        '''
         return AutoDiff(np.sin(x.val), np.cos(x.val)*x.der)
 
-    # Elemental cosine function
     def cos(x):
+        '''
+        Returns the cosine of an AutoDiff object with its updated derivative.
+        '''
         return AutoDiff(np.cos(x.val), -np.sin(x.val)*x.der)
 
-    # Elemental tangent function
     def tan(x):
-        return AutoDiff(np.tan(x.val), np.arctan(x.val)*x.der)
+        '''
+        Returns the tangent of an AutoDiff object with its updated derivative.
+        '''
+        return AutoDiff(np.tan(x.val), (1 / (np.cos(x.val)**2))*x.der)
+
+    def arcsin(x):
+        '''
+        Returns the arcsine of an AutoDiff object with its updated derivative.
+        '''
+        return AutoDiff(np.arcsin(x.val), (1 / np.sqrt(1 - (x.val**2))*x.der))
+
+    def arccos(x):
+        '''
+        Returns the arccosine of an AutoDiff object with its updated derivative.
+        '''
+        return AutoDiff(np.arccos(x.val), (-1 / np.sqrt(1 - (x.val**2))*x.der))
+    
+    def arctan(x):
+        '''
+        Returns the arctangent of an AutoDiff object with its updated derivative.
+        '''
+        return AutoDiff(np.arctan(x.val), (1 / (1 + self.val**2))*x.der)
+
+    def sinh(x):
+        '''
+        Returns the sinh of an AutoDiff object with its updated derivative.
+        '''
+        return AutoDiff(np.sinh(x.val), (np.cosh(x.val))*x.der)
+
+    def cosh(x):
+        '''
+        Returns the cosh of an AutoDiff object with its updated derivative.
+        '''
+        return AutoDiff(np.cosh(x.val), (np.sinh(x.val))*x.der)
+
+    def tanh(x):
+        '''
+        Returns the tanh of an AutoDiff object with its updated derivative.
+        '''
+        return AutoDiff(np.tanh(x.val), (1 / (np.cosh(x.val)**2))*x.der)
+
+    def sqrt(x):
+        '''
+        Returns the square root of an AutoDiff object with its updated derivative.
+        '''
+        return AutoDiff(np.sqrt(x), 0.5*(x.val**(-0.5))*x.der)
+
+    def exp(x):
+        '''
+        Returns the exponential of an AutoDiff object and its updated derivative.
+        '''
+        return AutoDiff(np.exp(x.val), np.exp(x.val)*x.der)
+
+    def log(x):
+        '''
+        Returns the logarithm of an AutoDiff object and its updated derivative.
+        '''
+        return AutoDiff(np.log(x.val), (1 / (x.val*np.sum(1)))*x.der)
+
+    def logistic(x):
+        '''
+        Applies the logistic function to an AutoDiff object and returns its
+        updated derivative.
+        '''
+        return AutoDiff(1 / (1 + np.exp(-x.val)), (np.exp(x.val) / (1 + np.exp(x.val))**2)*x.der)
 
 
 np.warnings.filterwarnings('ignore', category=np.VisibleDeprecationWarning)
