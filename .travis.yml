@@ -5,7 +5,7 @@ branches:
   
   only:
   - master
-  - milestone3_aditya
+
 
 install:
   - pip install pytest-cov
