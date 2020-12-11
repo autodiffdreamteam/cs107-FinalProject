@@ -3,3 +3,6 @@ Newtonscratch.py
 QS_Scratch.py
 QuadraticSpline.py
 AutoDiffBlend.py
+
+ad_library\Newtonscratch.py
+ad_library\AutoDiffBlend.py
