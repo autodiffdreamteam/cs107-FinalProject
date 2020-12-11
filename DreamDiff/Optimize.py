@@ -1,5 +1,5 @@
-from AutoDiff import AutoDiff as ad
-from AutoDiff import Function as fun
+from DreamDiff import DreamDiff as ad
+from DreamDiff import Function as fun
 import numpy as np
 
 
