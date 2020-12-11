@@ -5,12 +5,20 @@ branches:
   
   only:
   - master
+  - milestone3_aditya
+  - milestone_3_blake
 
 install:
+  - pip install pytest-cov
+  - pip install codecov
   - pip install -U pytest
   - pip install numpy
 
-script: pytest AutoDiffTest.py
 
+script: 
+  - pytest --cov=./ad_library/
+  
 after_success:
-  - bash <(curl -s https://codecov.io/bash)
+
+  - codecov
+
