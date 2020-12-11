@@ -70,8 +70,8 @@ class AutoDiff():
          [0. 0. 0. 0. 1.]]
         '''
         if input_function != None:
-            self._val = 0
-            self._der = 0
+            self._val = [val]
+            self._der = [der]
             self.parse_input(input_function, val)
         else:
             if input_pos != None:
@@ -313,31 +313,40 @@ class AutoDiff():
         '''
         return self.__gt__(other) or self.__eq__(other)
 
-    def parse_input(self, input_function, val):
-        func_list = ['exp(', 'cos(', 'sin(', 'tan(', 'log('] # etc
+    def _parse_input(self, input_function):
+        '''
+        Internal method that takes in an input function in string format, 
+        e.g. 'x^2 + sin(x) + cos(log(x))'
+        Returns a lambda expression with functions replaced by their Function.
+        '''
+        func_list = ['exp(', 'cos(', 'sin(', 'tan(', 'log(', 'arcsin(', 'arccos(', 
+                'arctan(', 'sinh(', 'cosh(', 'tanh(', 'sqrt(', 'log2(', 'log10(', 'logistic('] 
         expression = ''
         for i in range(len(input_function)):
-            try:
-                if input_function[i:i+4] in func_list:
-                    expression +='fun.'
-            except IndexError:
-                pass
-        
+            for j in range(5):
+                try:
+                    if input_function[i:i+j+4] in func_list:
+                        expression +='Function.'
+                        if input_function[i+3] != '(':
+                            input_function[i+3] = '0' # nullifies to make prefix free
+                except IndexError:
+                    pass
             if input_function[i] == '^':
                 expression += '**'
             else:
                 expression += input_function[i]
-            # broken by minus constants
         function = lambda x: eval(expression)
-        self.function = function
-        self.val, self.der = self.evaluate_function(val)
+        return function
 
-    def evaluate_function(self, a):
-        x = AutoDiff(a)
-        new_vals = self.function(x)
-        val = new_vals.val
-        der = new_vals.der
-        return val, der
+    def _evaluate_function(self, function, a):
+        '''
+        Internal method to evaluate a lambda function at a given point 'a'.
+        Returns an AutoDiff object with the value and derivative of the 
+        function evaluated at 'a'.
+        '''
+        ad_object = AutoDiff(a)
+        new_vals = function(ad_object)
+        return new_vals
 
     def __str__(self):
         '''
