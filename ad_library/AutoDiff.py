@@ -109,8 +109,6 @@ class AutoDiff():
                         except:
                             vals.append(v)
                             ders.append(np.zeros(total_vars))
-                    #self._val = np.hstack((vals))
-                    #self._der = np.vstack((ders))
                     self._val = np.array(vals)
                     self._der = np.array(ders)
             
