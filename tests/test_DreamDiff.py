@@ -1,10 +1,10 @@
-# Test suite for AutoDiff using pytest
+# Test suite for DreamDiff using pytest
 
 import pytest
 import numpy as np
 
-from AutoDiff import AutoDiff as ad
-from AutoDiff import Function as fun
+from DreamDiff import DreamDiff as ad
+from DreamDiff import Function as fun
 
 
 # Test initialization
