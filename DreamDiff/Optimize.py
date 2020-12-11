@@ -221,10 +221,10 @@ class Optimize:
         return None
 
 
-    def nesterov_grad_descent(fn, x0, epsilon, max_iters, eta):
+    def nesterov_grad_descent(f, x0, epsilon, max_iters, eta):
         '''
         Implements Nesterov's accelerated gradient descent 
-        optimization algorithm.
+        optimization algorithm, which uses a momentum parameter 't'.
 
         INPUTS
         ======
@@ -247,34 +247,66 @@ class Optimize:
         a list of the function's derivatives at those points in a 4-tuple.
         If no minimum is found, None is returned.
         '''
+        # Initialize xn at the starting point
         xn = x0
+
+        # Create a DreamDiff object to access private methods
         x = ad(1.0)
+
+        # Initialize the momentum coefficient
         t = 1.0
-        yn = x0
-        fn_parsed = x._parse_input(fn)
+
+        # Initialize the y-value
+        y = x0
+
+        # Parse the input function string
+        f_parsed = x._parse_input(f)
+
+        # Initialize empty lists to hold results
         xn_history = []
+        yn_history = []
+        der_history = []
+
+        # Run the algorithm at most 'max_iters' times
         for i in range(max_iters):
+
+            # Calculate values, derivatives, and store in lists
             xn_history.append(xn)
-            new_fxn = x._evaluate_function(fn_parsed, yn)
-            Dfxn = new_fxn.der[0]
-            # Calculate the new gradient
+            new_f = x._evaluate_function(f_parsed, y)
+            yn = new_f.val[0]
+            der = new_f.der[0]
+            yn_history.append(yn)
+            der_history.append(der)
+
+            # Apply Nesterov's momentum update
             new_t = 0.5*(1 + np.sqrt(1 + 4*t**2))
-            new_xn = yn - eta*Dfxn
-            new_yn = new_xn + (t - 1.0)/(new_t)*(new_xn - xn)
+
+            # Calculate the new gradient (scaled by learning rate)
+            new_xn = y - eta*der
+            new_y = new_xn + (t - 1.0)/(new_t)*(new_xn - xn)
+
+            # If threshold is met, terminate the algorithm and return results
             if abs(new_xn - xn) < epsilon:
                 print('Found solution after {} iterations.'.format(i))
                 print('Solution is: {}'.format(new_xn))
-                return new_xn
-            if np.dot(yn - new_xn, new_xn - xn) > 0:
-                new_yn = new_xn
+                return (new_xn, xn_history, yn_history, der_history)
+
+            # Reset conditions
+            if np.dot(y - new_xn, new_xn - xn) > 0:
+                new_y = new_xn
                 new_t = 1
+
+            # Update xn, y, t
             xn = new_xn
-            yn = new_yn
+            y = new_y
             t = new_t
+
+        # If no solution is found within 'max_iters', tell the user and return None
         print('No solution found after max iterations.')
+        return None
     
 
-    def animate_grad_desc(f, x0, epsilon=0.000001, max_iters=500, eta=0.1, runtime=20): 
+    def animate_grad_desc(f, x0, epsilon=0.000001, max_iters=500, eta=0.1, method='grad', runtime=20): 
         '''
         Creates an animation of the gradient descent method for scalar
         functions by plotting the function and showing the tangent lines
@@ -291,17 +323,28 @@ class Optimize:
         max_iters: int, optional
             The maximum number of times to run the algorithm.
         eta: int or float, optional
+            The learning rate, which controls the algorithm step size.
+        method: str, optional
+            The gradient descent method to use: input 'grad' to use
+            standard gradient descent and 'nesterov' to use
+            Nesterov's accelerated gradient descent.
         runtime: int, optional
             The length of time to run the animation.
 
         RETURNS
         =======
         A matplotlib animataion showing how gradient descent located
-        a minimum of the input function.
+        a minimum of the input function, depending on the descent method
+        used.
         '''
         # Get the minimum and history of x-values, y-values, and derivatives 
         # for the input function using grad_descent
-        results = Optimize.grad_descent(f, x0, epsilon, max_iters, eta)
+        if method == 'grad':
+            results = Optimize.grad_descent(f, x0, epsilon, max_iters, eta)
+        elif method == 'nesterov':
+            results = Optimize.nesterov_grad_descent(f, x0, epsilon, max_iters, eta)
+        else:
+            raise Exception(f'invalid gradient descent method: {method}')
 
         # Check if grad_descent returned None
         if results == None:
@@ -348,24 +391,4 @@ class Optimize:
                     plt.pause(0.2)
                     runtime -= 1
 
-        
 
-
-
-
-
-f1 = 'x^3 - 5*x^2 + 2*x - 1'
-f2 = 'x^2'
-f3 = 'x^3 - 3*x^2 + 4'
-f4 = 'tan(sin(x) + 3)'
-f5 = 'sin(x) + 5'
-#root, history = Optimize.newtons_method(f1, 2, 0.00001, max_iters=500)
-#Optimize.animate_newtons(f3, 0.3, 0.000001, max_iters=500, runtime=20)
-#print(root, history)
-
-#Optimize.grad_descent(f4, 4, 0.00001, max_iters=500, eta=0.2)
-#Optimize.animate_grad_desc(f4, 4, 0.00001, max_iters=500, eta=0.3, runtime=20)
-#Optimize.animate_grad_desc(f4, 4, 0.00001, max_iters=500, eta=0.1, runtime=20)
-Optimize.animate_grad_desc(f4, 4, 0.00001, max_iters=500, eta=0.5, runtime=20)
-
-#Optimize.nesterov_grad_descent(f1, 0, 0.00001, max_iters=500, eta=0.5)
