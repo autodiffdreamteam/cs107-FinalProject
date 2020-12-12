@@ -3,8 +3,10 @@
 import pytest
 import numpy as np
 
-from DreamDiff import DreamDiff as ad
-from DreamDiff import Function as fun
+#from DreamDiff import DreamDiff as ad
+#from DreamDiff import Function as fun
+from DreamDiff.DreamDiff import DreamDiff as ad
+from DreamDiff.DreamDiff import Function as fun
 
 
 # Test initialization
