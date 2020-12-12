@@ -12,11 +12,12 @@ install:
   - pip install codecov
   - pip install -U pytest
   - pip install numpy
+  - pip install matplotlib
 
 script: 
-  - pytest --cov=./ad_library/test_AutoDiff.py
-  
-after_success:
+  - pytest --cov=./DreamDiff/
 
+
+after_success:
   - codecov
 
