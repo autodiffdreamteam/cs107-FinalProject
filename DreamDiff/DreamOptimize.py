@@ -392,3 +392,139 @@ class Optimize:
                     runtime -= 1
 
 
+    def plot_coeffs(coeffs, x_array, y_array):
+        '''
+        Plots coefficients along with original points
+
+        INPUTS
+        ======
+        coeffs: array of length 3n, required
+            The x values for user's given points, must be same length as y_array
+
+        x_array: array of numeric values of length n+1, required
+            The x values for user's given points, must be same length as y_array
+        y_array: array of numeric values of length n+1, required
+            The y values for user's given points, must be same length as x_array
+
+        RETURNS
+        =======
+        plot: A matplotlib.pyplot object
+            A plot with quadratic splines and points plotted.
+        '''
+        # check x and y for all points
+        if not (len(x_array) == len(y_array)):
+            raise Exception('Number of x values for data points do not match number of y values')
+
+        num_eq = int(len(coeffs)/3)
+        
+        # plot each equation
+        for i in range(num_eq):
+            # define quadratic function for plotting
+            def f(x, coeffs, i):
+                return coeffs[i*3]*(x**2) + coeffs[(i*3)+1]*x + coeffs[(i*3)+2]
+            
+            temp_x = []
+            # plot individual quadratic function
+            temp_arange = np.arange(start = x_array[i], stop=x_array[i+1], step=0.01)
+            for j in temp_arange:
+                temp_x.append(f(j, coeffs, i))
+            plt.plot(temp_arange, temp_x)
+
+        # plot points
+        plt.plot(x_array, y_array, 'ro')
+        plt.title('Quadratic Splines')
+        plt.show()
+        return plt
+    
+
+    def quadratic_spline(x_array, y_array, plot = False):
+        '''
+        Runs Quadratic Spline interpolation on a set of points.
+
+        INPUTS
+        ======
+        x_array: array of numeric values, required
+            The x values for user's given points, must be same length as y_array
+        y_array: array of numeric values, required
+            The x values for user's given points, must be same length as x_array
+        plot: bool, optional, default = False
+            If plot is True, plots the piecewise quadratic splines using matplotlib.pyplot
+
+        RETURNS
+        =======
+        Coeffs: list of floats
+            The list of coefficients to the quadratic spline equations in list as [a_1, b_1, c_1,... a_n, b_n, c_n]
+
+        Prints piecewise function using coefficients.
+        
+        If plot==True, displays quadratic splines using matplotlib.pyplot
+        '''
+
+        # ensure all points have x and y values
+        if not (len(x_array) == len(y_array)):
+            raise Exception('number of x values for data points do not match number of y values')
+
+        # ensure at least 3 data points for quadratic splines
+        if len(x_array)<3:
+            raise Exception('Too few data points for quadratic spline interpolation')
+        
+        n = len(x_array) - 1
+        sys_of_equations = np.zeros((3*n, 3*n))
+
+        # define AutoDiff objects a,b,c
+        def a(ad_val):
+            return ad(ad_val**2)
+        def b(ad_val):
+            return ad(ad_val)
+        def c(ad_val):
+            return ad(1)
+
+        # define 3n linear equations
+        for i in range(n):
+            # Equations to connect quadratic between point i, i+1
+            sys_of_equations[3*i][(3*i)] = a(x_array[i]).val
+            sys_of_equations[3*i][((3*i)+1)] = b(x_array[i]).val
+            sys_of_equations[3*i][((3*i)+2)] = c(x_array[i]).val
+            sys_of_equations[(3*i)+ 1][(3*i)] = a(x_array[i+1]).val
+            sys_of_equations[(3*i)+ 1][((3*i)+1)] = b(x_array[i+1]).val
+            sys_of_equations[(3*i)+ 1][((3*i)+2)] = c(x_array[i+1]).val
+
+            if i!=n-1:
+                # Constraints so derivative matches at all interior points
+                sys_of_equations[(3*i)+ 2][(3*i)] = a(x_array[i+1]).der
+                sys_of_equations[(3*i)+ 2][((3*i)+1)] = b(x_array[i+1]).der
+                sys_of_equations[(3*i)+ 2][((3*i)+2)] = c(x_array[i+1]).der
+                sys_of_equations[(3*i)+ 2][(3*(i+1))] = -(a(x_array[i+1]).der)
+                sys_of_equations[(3*i)+ 2][((3*(i+1))+1)] = -(b(x_array[i+1]).der)
+                sys_of_equations[(3*i)+ 2][((3*(i+1))+2)] = -(c(x_array[i+1]).der)
+
+        # Last of 3n equations
+        sys_of_equations[3*n -1][0] = 1
+
+        # construct y array for linear equations
+        y = np.zeros(3*n)
+        for i in range(n):
+            y[(3*i)] = y_array[i]
+            y[(3*i)+1] = y_array[i+1]
+            y[(3*i)+2] = 0
+
+        # solve for coeffs
+        coeffs_all = np.linalg.lstsq(sys_of_equations, y, rcond=None)
+        coeffs = coeffs_all[0]
+
+        # truncate coeffs
+        for i in range(len(coeffs)):
+            coeffs[i] = float(f"{coeffs[i]:.4f}")
+
+        print("Quadratic Spline Equations: ")
+        for index in range(n):
+            print("S_{index}(x) = {a}*x^2 + {b}*x + {c} for x ∈ [{i_0}, {i_1}]".format(
+                index=index, a=coeffs[index*3], b=coeffs[index*3+1], c=coeffs[index*3+2], i_0=x_array[index], i_1=x_array[index+1]
+                ))
+        # plot
+        if plot == True:
+            spline_plot = Optimize.plot_coeffs(coeffs, x_array, y_array)
+
+        return coeffs
+
+
