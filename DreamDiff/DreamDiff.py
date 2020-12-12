@@ -3,7 +3,7 @@ import numpy as np
 
 class DreamDiff():
     
-    def __init__(self, val, der=[1], input_pos=None, input_function=None):
+    def __init__(self, val, der=[1], input_pos=None):
         '''
         Constructs an DreamDiff object on which to perform forward automatic differentation.
 
@@ -23,9 +23,6 @@ class DreamDiff():
             functions with many inputs by passing in a length 2 array,
             where the first element is the total number of inputs and
             the second element is the index of that variable.
-        input_function: str, optional, default is None
-            Allows the user to more easily define a function by passing
-            in a string.
 
         RETURNS
         =======
@@ -69,48 +66,43 @@ class DreamDiff():
          [0. 0. 0. 1. 0.]
          [0. 0. 0. 0. 1.]]
         '''
-        if input_function != None:
-            self._val = [val]
-            self._der = [der]
-            self.parse_input(input_function, val)
-        else:
-            if input_pos != None:
-                if not isinstance(input_pos, (list, np.ndarray)):
-                    raise AssertionError('input_pos must be a list or np.ndarray')
-                if len(input_pos) != 2:
-                    raise AssertionError('input_pos must be of length 2')
-                if input_pos[0] <= input_pos[1]:
-                    raise AssertionError('variable index must not exceed total number of variables')
-                else:
-                    der = np.zeros((input_pos[0]))
-                    der[input_pos[1]] = 1
-            if isinstance(val, (int, float)):
-                val = [val]
-            if len(val) == 1:
-                try:
-                    self._val = val[0].val
-                    self._der = val[0].der
-                except:
-                    self._val = np.array(val)
-                    self._der = np.array(der)
+        if input_pos != None:
+            if not isinstance(input_pos, (list, np.ndarray)):
+                raise AssertionError('input_pos must be a list or np.ndarray')
+            if len(input_pos) != 2:
+                raise AssertionError('input_pos must be of length 2')
+            if input_pos[0] <= input_pos[1]:
+                raise AssertionError('variable index must not exceed total number of variables')
             else:
-                all_scalar = self._check_all_scalar(val)
-                if all_scalar:
-                    self._val = np.array(val)
-                    self._der = np.array(der)
-                else:
-                    vals = []
-                    ders = []
-                    total_vars = self._get_total_vars(val)
-                    for v in val:
-                        try:
-                            vals.append(v.val)
-                            ders.append(v.der)
-                        except:
-                            vals.append(v)
-                            ders.append(np.zeros(total_vars))
-                    self._val = np.array(vals)
-                    self._der = np.array(ders)
+                der = np.zeros((input_pos[0]))
+                der[input_pos[1]] = 1
+        if isinstance(val, (int, float)):
+            val = [val]
+        if len(val) == 1:
+            try:
+                self._val = val[0].val
+                self._der = val[0].der
+            except:
+                self._val = np.array(val)
+                self._der = np.array(der)
+        else:
+            all_scalar = self._check_all_scalar(val)
+            if all_scalar:
+                self._val = np.array(val)
+                self._der = np.array(der)
+            else:
+                vals = []
+                ders = []
+                total_vars = self._get_total_vars(val)
+                for v in val:
+                    try:
+                        vals.append(v.val)
+                        ders.append(v.der)
+                    except:
+                        vals.append(v)
+                        ders.append(np.zeros(total_vars))
+                self._val = np.array(vals)
+                self._der = np.array(ders)
             
     def _check_all_scalar(self, val):
         '''
