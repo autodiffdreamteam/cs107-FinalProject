@@ -16,7 +16,7 @@ install:
 
 
 script: 
-  - pytest --cov=./tests/
+  - pytest --cov=./DreamDiff/
   
 after_success:
 
