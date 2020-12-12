@@ -410,8 +410,7 @@ class Optimize:
 
         RETURNS
         =======
-        plot: A matplotlib.pyplot object
-            A plot with quadratic splines and points plotted.
+        True if plotted, nothing otherwise.
         '''
         # check x and y for all points
         if not (len(x_array) == len(y_array)):
@@ -436,7 +435,7 @@ class Optimize:
         plt.plot(x_array, y_array, 'ro')
         plt.title('Quadratic Splines')
         plt.show()
-        return plt
+        return True
     
 
     def quadratic_spline(x_array, y_array, plot = False):
