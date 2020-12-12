@@ -52,3 +52,9 @@ def test_plot_coeffs():
     with pytest.raises(Exception) as excinfo:
         Optimize.plot_coeffs([1,2], [10,15,20])
     assert "do not match" in str(excinfo.value)
+
+    assert(Optimize.plot_coeffs([1,2], [10,15,20]) == None)
+
+# Test 6: Animate Gradient Descent
+def test_animate_gradient():
+    assert(Optimize.animate_grad_desc(f, 4, epsilon=0.00001, max_iters=500, eta=0.1, runtime=20, method='grad') == None)
