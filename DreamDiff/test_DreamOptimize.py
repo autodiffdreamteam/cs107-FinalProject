@@ -5,9 +5,10 @@
 
 
 #Import the relevant classes and modules
-from DreamDiff import DreamDiff as ad
-from DreamDiff import Function as fun
-from DreamOptimize import Optimize
+#from DreamDiff import DreamDiff as ad
+#from DreamOptimize import Optimize
+from DreamDiff.DreamDiff import DreamDiff as ad
+from DreamDiff.DreamOptimize import Optimize
 
 import numpy as np
 import pytest 
