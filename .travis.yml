@@ -5,6 +5,7 @@ branches:
   
   only:
   - master
+  - milestone3_aditya
 
 
 install:
@@ -15,7 +16,7 @@ install:
 
 
 script: 
-  - pytest --cov=./ad_library/
+  - pytest --cov=./tests/
   
 after_success:
 
