@@ -436,7 +436,8 @@ class Optimize:
         plt.plot(x_array, y_array, 'ro')
         plt.title('Quadratic Splines')
         plt.show()
-        return plt
+        #return plt
+        return True
     
 
     def quadratic_spline(x_array, y_array, plot = False):
