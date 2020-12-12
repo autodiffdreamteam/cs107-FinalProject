@@ -14,7 +14,7 @@ For example, open source still requires an internet connection, which automatica
 
 
 Travis Build Badge:
-[![Build Status](https://travis-ci.org/autodiffdreamteam/cs107-FinalProject.svg?branch=milestone_2_aditya)](https://travis-ci.org/autodiffdreamteam/cs107-FinalProject)
+[![Build Status](https://travis-ci.org/autodiffdreamteam/cs107-FinalProject.svg?branch=master)](https://travis-ci.org/autodiffdreamteam/cs107-FinalProject)
 
 Codecoverage Badge:
 [![codecov](https://codecov.io/gh/autodiffdreamteam/cs107-FinalProject/branch/milestone_3_blake/graph/badge.svg?token=7VF8CR2OBS)](https://codecov.io/gh/autodiffdreamteam/cs107-FinalProject)
