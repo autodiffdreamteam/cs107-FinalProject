@@ -152,6 +152,7 @@ class Optimize:
                     plt.legend()
                     plt.pause(0.2)
                     runtime -= 1
+            return None
 
 
     def grad_descent(f, x0, epsilon=0.000001, max_iters=500, eta=0.1):
@@ -390,6 +391,7 @@ class Optimize:
                     plt.legend()
                     plt.pause(0.2)
                     runtime -= 1
+            return None
 
 
     def plot_coeffs(coeffs, x_array, y_array):
