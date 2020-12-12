@@ -61,3 +61,9 @@ def test_plot_coeffs():
 def test_animate_gradient():
     f = 'tan(sin(x) + 3)'
     assert(Optimize.animate_grad_desc(f, 4, epsilon=0.00001, max_iters=500, eta=0.1, runtime=20, method='grad') == None)
+
+
+# Test 7: Animate Newton's Method
+def test_animate_newtons():
+    f = 'x^3 - 3*x^2 + 4'
+    assert(Optimize.animate_newtons(f, 0.3, epsilon=0.000001, max_iters=500, runtime=20) == None)
