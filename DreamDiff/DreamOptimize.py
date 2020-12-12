@@ -1,5 +1,5 @@
-from DreamDiff import DreamDiff as ad
-from DreamDiff import Function as fun
+#from DreamDiff import DreamDiff as ad
+from DreamDiff.DreamDiff import DreamDiff as ad
 import numpy as np
 import matplotlib.pyplot as plt
 
