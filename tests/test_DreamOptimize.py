@@ -36,15 +36,19 @@ def test_nesterov_grad_descent():
     assert (round(Optimize.nesterov_grad_descent('x^2 - 2', 2.0, 0.001, max_iters=5000, eta = 0.5), 3) == round(0.000,3))
 
 # Test 4: Quadratic Splines
-def test_Quadratic_Spline():
-    assert (int(abs(Optimize.QuadraticSpline([2,3,4], [3,8,11])[0])) == 0)
-    assert (int(Optimize.QuadraticSpline([2,3,4,5,6], [3,8,11,14,18])[1]) == 5)
+def test_quadratic_spline():
+    assert (int(abs(Optimize.quadratic_spline([2,3,4], [3,8,11])[0])) == 0)
+    assert (int(Optimize.quadratic_spline([2,3,4,5,6], [3,8,11,14,18])[1]) == 5)
     
     with pytest.raises(Exception) as excinfo:
-        Optimize.QuadraticSpline([1,2], [10,15,20])
+        Optimize.quadratic_spline([1,2], [10,15,20])
     assert "do not match" in str(excinfo.value)
 
     values = Optimize.QuadraticSpline([2,3,4,5,6], [-3,-8,-11,-14,-18])
     assert (int(values[0]*4 + values[1]*3 + values[2]) == -8)
 
-    
+# Test 5: Plot Coefficients
+def test_plot_coeffs():
+    with pytest.raises(Exception) as excinfo:
+        Optimize.plot_coeffs([1,2], [10,15,20])
+    assert "do not match" in str(excinfo.value)
