@@ -11,6 +11,13 @@ Codecoverage Badge:
 
 DreamDiff is a Python package for automatic differentiation, root-finding, optimization, and interpolation.
 
+To install, simply run `pip install DreamDiff`
+
+Documentation: https://github.com/autodiffdreamteam/cs107-FinalProject/blob/master/docs/documentation.ipynb
+
+PyPI: https://pypi.org/project/DreamDiff/
+
+## Impact and inclusivity
 Our goal for DreamDiff is for it to live well beyond the confines of a computer science course, as all good software should. While we believe it has potential to be used in a wide range of exciting applications, it is important to also consider the broader implications of our software.
 
 Our package implements forward-mode automatic differentiation, gradient descent, Nesterov's accelerated gradient descent, Newton’s method and quadratic splines. All these tools have distinct usages, but we hope the convenience of a centralized optimization package provides some extra utility to users working on various optimization tasks in machine learning, minimization and maximization problems, and interpolation using quadratic splines.
